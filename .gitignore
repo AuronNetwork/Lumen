@@ -1,0 +1,10 @@
+/build*/
+/dist/
+/.tools/
+*.pdb
+*.obj
+*.ilk
+*.user
+__pycache__/
+/RELEASE-VERSION.txt
+/RELEASE-COMMIT.txt

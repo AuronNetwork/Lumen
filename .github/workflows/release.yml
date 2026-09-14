@@ -1,0 +1,100 @@
+name: Build and release Lumen
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumen-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set release version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "1.4.${{ github.run_number }}"
+          "LUMEN_VERSION=$version" >> $env:GITHUB_ENV
+          "value=$version" >> $env:GITHUB_OUTPUT
+      - name: Configure
+        run: cmake -S . -B build -A x64 -DLUMEN_VERSION=${{ env.LUMEN_VERSION }} -DLUMEN_REPOSITORY=${{ github.repository }}
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Build installer and source packages
+        shell: pwsh
+        run: |
+          $iscc = & ./scripts/bootstrap-inno.ps1
+          python scripts/package.py --version $env:LUMEN_VERSION --build build/Release --iscc $iscc --commit $env:GITHUB_SHA
+      - name: Verify installer lifecycle
+        shell: pwsh
+        run: ./scripts/test-installer.ps1
+      - name: Retain build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Lumen-${{ env.LUMEN_VERSION }}
+          path: |
+            dist/Lumen-Setup.exe
+            dist/Lumen-Installer.zip
+            dist/Lumen-Source.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      LUMEN_VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: Lumen-${{ needs.build.outputs.version }}
+          path: dist
+      - name: Publish complete release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $head = gh api "repos/$env:GITHUB_REPOSITORY/commits/main" --jq '.sha'
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify current main' }
+          if ($head -ne $env:GITHUB_SHA) { Write-Output 'A newer push exists; leaving this build as an artifact.'; exit 0 }
+          $tag = "v$env:LUMEN_VERSION"
+          $notes = @"
+          Lumen $env:LUMEN_VERSION for Minecraft Bedrock 26.45 on Windows x64.
+
+          Download **Lumen-Installer.zip**, extract it and run **Lumen-Setup.exe**.
+          Installed copies check for updates when the launcher opens. Save and close Minecraft before an update; the installer never closes the game for you.
+
+          **Lumen-Source.zip** contains the complete corresponding source and build instructions. **SHA256SUMS.txt** contains the release checksums. The installer is not Authenticode-signed.
+
+          Built from commit $env:GITHUB_SHA. Automated build and tests passed; this is not a new manual Minecraft compatibility test. See TESTING.md for acceptance limits.
+          "@
+          $notes | Set-Content -Encoding utf8 dist/release-notes.md
+          gh release view $tag --repo $env:GITHUB_REPOSITORY --json isDraft 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) { throw 'This release tag already exists; refusing to replace published assets.' }
+          gh release create $tag --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --title "Lumen $env:LUMEN_VERSION" --notes-file dist/release-notes.md dist/Lumen-Setup.exe dist/Lumen-Installer.zip dist/Lumen-Source.zip dist/SHA256SUMS.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Release asset upload failed; release will not be published.' }
+          $release = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/$tag" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify uploaded release assets' }
+          $setup = @($release.assets | Where-Object { $_.name -eq 'Lumen-Setup.exe' })
+          $localHash = (Get-FileHash dist/Lumen-Setup.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($setup.Count -ne 1 -or $setup[0].digest -ne "sha256:$localHash") { throw 'GitHub installer digest differs; keeping release as a draft.' }
+          $head = gh api "repos/$env:GITHUB_REPOSITORY/commits/main" --jq '.sha'
+          if ($LASTEXITCODE -ne 0 -or $head -ne $env:GITHUB_SHA) { Write-Output 'Keeping obsolete build as a draft.'; exit 0 }
+          gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed.' }

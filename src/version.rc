@@ -1,0 +1,31 @@
+#include <windows.h>
+#include "version.h"
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION LUMEN_VERSION_RESOURCE
+ PRODUCTVERSION LUMEN_VERSION_RESOURCE
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+ FILEFLAGS 0
+ FILEOS VOS_NT_WINDOWS32
+#ifdef LUMEN_CLIENT_DLL
+ FILETYPE VFT_DLL
+#else
+ FILETYPE VFT_APP
+#endif
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "040904B0"
+  BEGIN
+   VALUE "CompanyName", "AuronNetwork\0"
+   VALUE "FileDescription", "Lumen - Minecraft Bedrock client\0"
+   VALUE "FileVersion", LUMEN_VERSION "\0"
+   VALUE "ProductName", "Lumen\0"
+   VALUE "ProductVersion", LUMEN_VERSION "\0"
+   VALUE "LegalCopyright", "Lumen contributors. GPL-3.0-only.\0"
+  END
+ END
+ BLOCK "VarFileInfo"
+ BEGIN
+  VALUE "Translation", 0x0409, 1200
+ END
+END
