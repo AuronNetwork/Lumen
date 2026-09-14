@@ -89,9 +89,12 @@ jobs:
           if ($LASTEXITCODE -eq 0) { throw 'This release tag already exists; refusing to replace published assets.' }
           gh release create $tag --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --title "Lumen $env:LUMEN_VERSION" --notes-file dist/release-notes.md dist/Lumen-Setup.exe dist/Lumen-Installer.zip dist/Lumen-Source.zip dist/SHA256SUMS.txt
           if ($LASTEXITCODE -ne 0) { throw 'Release asset upload failed; release will not be published.' }
-          $release = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/$tag" | ConvertFrom-Json
+          # Draft releases are listed by ID; the public tag endpoint may be 404 until publication.
+          $releases = gh api "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" | ConvertFrom-Json
           if ($LASTEXITCODE -ne 0) { throw 'Could not verify uploaded release assets' }
-          $setup = @($release.assets | Where-Object { $_.name -eq 'Lumen-Setup.exe' })
+          $release = @($releases | Where-Object { $_.tag_name -eq $tag -and $_.draft })
+          if ($release.Count -ne 1) { throw 'Could not identify the newly uploaded draft' }
+          $setup = @($release[0].assets | Where-Object { $_.name -eq 'Lumen-Setup.exe' })
           $localHash = (Get-FileHash dist/Lumen-Setup.exe -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($setup.Count -ne 1 -or $setup[0].digest -ne "sha256:$localHash") { throw 'GitHub installer digest differs; keeping release as a draft.' }
           $head = gh api "repos/$env:GITHUB_REPOSITORY/commits/main" --jq '.sha'
