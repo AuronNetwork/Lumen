@@ -28,7 +28,7 @@ jobs:
           "LUMEN_VERSION=$version" >> $env:GITHUB_ENV
           "value=$version" >> $env:GITHUB_OUTPUT
       - name: Configure
-        run: cmake -S . -B build -A x64 -DLUMEN_VERSION=${{ env.LUMEN_VERSION }} -DLUMEN_REPOSITORY=${{ github.repository }}
+        run: cmake -S . -B build -A x64 "-DLUMEN_VERSION=${{ env.LUMEN_VERSION }}" "-DLUMEN_REPOSITORY=${{ github.repository }}"
       - name: Build
         run: cmake --build build --config Release --parallel 4
       - name: Test

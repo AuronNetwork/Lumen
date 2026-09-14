@@ -6,7 +6,7 @@ Requirements: Windows x64, Visual Studio 2022 C++ tools, Windows SDK, CMake
 From the repository root:
 
 ```powershell
-cmake -S . -B build -A x64 -DLUMEN_VERSION=1.4.0
+cmake -S . -B build -A x64 "-DLUMEN_VERSION=1.4.0"
 cmake --build build --config Release --parallel 4
 ctest --test-dir build -C Release --output-on-failure
 ```

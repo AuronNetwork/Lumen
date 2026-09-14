@@ -45,7 +45,7 @@ excluded = {'.git', 'build', 'dist', '.tools', '__pycache__'}
 with zipfile.ZipFile(source, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for file in sorted(root.rglob('*')):
         rel = file.relative_to(root)
-        if file.is_file() and not any(part in excluded for part in rel.parts) and out not in file.parents:
+        if file.is_file() and rel.parts[0] not in excluded and '.git' not in rel.parts and '__pycache__' not in rel.parts and out not in file.parents:
             z.write(file, 'Lumen/' + rel.as_posix())
     z.writestr('Lumen/RELEASE-VERSION.txt', args.version + '\n')
     z.writestr('Lumen/RELEASE-COMMIT.txt', args.commit + '\n')
