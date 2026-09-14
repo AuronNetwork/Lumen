@@ -1,3 +1,5 @@
+<img src="assets/lumen-180.png" width="80" height="80" alt="Lumen — Auron triangle with a yellow light beam">
+
 # Lumen
 
 A lightweight Windows client for **Minecraft Bedrock 26.45** with Xray, Zoom,

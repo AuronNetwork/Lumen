@@ -33,6 +33,7 @@ MinVersion=10.0.19041
 LicenseFile={#PayloadDir}\LICENSE
 OutputDir={#OutputPath}
 OutputBaseFilename=Lumen-Setup
+SetupIconFile={#PayloadDir}\assets\lumen.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern dark

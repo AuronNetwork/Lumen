@@ -2,6 +2,7 @@
 // Lumen launcher design: Figma Lfm0C6WFqEGv6z6XLKszSW, node 11:17.
 #include "launcher_ui.h"
 #include "version.h"
+#include "resource.h"
 #include <windowsx.h>
 #include <commctrl.h>
 #include <dwmapi.h>
@@ -201,7 +202,10 @@ int run(HINSTANCE instance,LPTHREAD_START_ROUTINE start,bool preview,LPTHREAD_ST
         MessageBoxW(nullptr,L"The launcher could not initialize Windows graphics.",L"Lumen",MB_OK|MB_ICONERROR);return 1;
     }
     initFonts();INITCOMMONCONTROLSEX controls{sizeof(controls),ICC_STANDARD_CLASSES};InitCommonControlsEx(&controls);
-    WNDCLASSW wc{};wc.lpfnWndProc=proc;wc.hInstance=instance;wc.hCursor=LoadCursorW(nullptr,IDC_ARROW);wc.lpszClassName=L"Lumen.Launcher.Figma";wc.style=CS_DBLCLKS;RegisterClassW(&wc);
+    WNDCLASSEXW wc{sizeof(WNDCLASSEXW)};wc.lpfnWndProc=proc;wc.hInstance=instance;wc.hCursor=LoadCursorW(nullptr,IDC_ARROW);wc.lpszClassName=L"Lumen.Launcher.Figma";wc.style=CS_DBLCLKS;
+    wc.hIcon=static_cast<HICON>(LoadImageW(instance,MAKEINTRESOURCEW(IDI_LUMEN),IMAGE_ICON,GetSystemMetrics(SM_CXICON),GetSystemMetrics(SM_CYICON),LR_SHARED));
+    wc.hIconSm=static_cast<HICON>(LoadImageW(instance,MAKEINTRESOURCEW(IDI_LUMEN),IMAGE_ICON,GetSystemMetrics(SM_CXSMICON),GetSystemMetrics(SM_CYSMICON),LR_SHARED));
+    RegisterClassExW(&wc);
     window=CreateWindowExW(WS_EX_APPWINDOW,wc.lpszClassName,preview?L"Lumen " LUMEN_VERSION_W L" · UI Preview":L"Lumen " LUMEN_VERSION_W L" · Launcher",WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,760,592,nullptr,nullptr,instance,nullptr);
     if(!window)return 1;
     const BOOL dark=TRUE;const DWORD corner=2;DwmSetWindowAttribute(window,20,&dark,sizeof(dark));DwmSetWindowAttribute(window,33,&corner,sizeof(corner));
