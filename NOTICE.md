@@ -1,10 +1,12 @@
 # Attribution and licenses
 
-Lumen 1.4 series, a local extension of Xray Light, September 14, 2026.
+Lumen 1.5 series, a local extension of Xray Light, September 15, 2026.
 License: GPL-3.0-only. Version 1.2.2 translated the interface into English.
 Version 1.2.3 removes Lumen's local operator requirement for scanning and
 rendering ore markers. Version 1.3.0 adds an independently implemented
 native launcher interface designed in Figma for Lumen.
+Version 1.5.0 independently updates game ownership, client-map layout, cursor
+capture and tick/gamma signatures for Bedrock 26.50; see docs/BEDROCK-26.50.md.
 
 See [LATITE-ATTRIBUTION.md](LATITE-ATTRIBUTION.md) for the detailed source
 inventory, exact signature mapping, local corrections, dependency boundaries

@@ -1,6 +1,6 @@
 ; Lumen installer - GPL-3.0-only
 #ifndef AppVersion
-  #define AppVersion "1.4.0"
+  #define AppVersion "1.5.0"
 #endif
 #ifndef PayloadDir
   #define PayloadDir "..\dist\payload"

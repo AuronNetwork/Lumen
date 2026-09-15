@@ -1,6 +1,9 @@
 # Lumen: Latite attribution and implementation provenance
 
-Applies to the **Lumen 1.4 series**, Minecraft Bedrock 26.45 for Windows x64.
+The original inventory below describes the **Lumen 1.4 series**, Minecraft
+Bedrock 26.45 for Windows x64. The 1.5 series retains this attribution and adds
+an independent [26.50 compatibility update](docs/BEDROCK-26.50.md). Updated
+ownership/map/cursor layouts and tick/gamma signatures are local Lumen changes.
 Reviewed on **September 14, 2026**.
 
 **Lumen is a standalone client built using selected Latite source code and

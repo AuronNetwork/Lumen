@@ -1,7 +1,14 @@
 # Validation and acceptance limits
 
+The 1.5.0 candidate updates the integration for Minecraft Bedrock 26.50,
+Windows package 1.26.5004.0. All 16 final signatures are unique in the installed
+running module, and the changed ownership/map/cursor layouts were checked with
+read-only inspection. The build and all six CTest cases pass. A clean-process
+gameplay test is pending; see [the audit](docs/BEDROCK-26.50.md).
+
 The release workflow builds the native x64 programs, runs the scanner,
-view/projection/gamma, mouse, update-policy and SHA-256 tests, and validates
+view/projection/gamma, mouse, update-policy, SHA-256 and exact Bedrock-version
+tests, and validates
 the installer/source ZIPs. It also installs into an isolated runner folder,
 verifies installed files and exercises uninstallation.
 

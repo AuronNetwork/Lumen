@@ -24,7 +24,7 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          $version = "1.4.${{ github.run_number }}"
+          $version = "1.5.${{ github.run_number }}"
           "LUMEN_VERSION=$version" >> $env:GITHUB_ENV
           "value=$version" >> $env:GITHUB_OUTPUT
       - name: Configure
@@ -75,7 +75,7 @@ jobs:
           if ($head -ne $env:GITHUB_SHA) { Write-Output 'A newer push exists; leaving this build as an artifact.'; exit 0 }
           $tag = "v$env:LUMEN_VERSION"
           $notes = @"
-          Lumen $env:LUMEN_VERSION for Minecraft Bedrock 26.45 on Windows x64.
+          Lumen $env:LUMEN_VERSION for Minecraft Bedrock 26.50 on Windows x64.
 
           Download **Lumen-Installer.zip**, extract it and run **Lumen-Setup.exe**.
           Installed copies check for updates when the launcher opens. Save and close Minecraft before an update; the installer never closes the game for you.

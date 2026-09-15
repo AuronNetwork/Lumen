@@ -117,7 +117,7 @@ void drawControl(const DRAWITEMSTRUCT& item){
     if(item.CtlID==statusId){
         p.fill(0,0,w,h,panel,12);p.border(.5f,.5f,w-1,h-1,line,12);
         p.text(20,14,285,18,tag(),11,signal);
-        p.text(330,14,w-350,18,L"MINECRAFT BEDROCK 26.45",10,muted,false,DWRITE_TEXT_ALIGNMENT_TRAILING);
+        p.text(330,14,w-350,18,L"MINECRAFT BEDROCK 26.50",10,muted,false,DWRITE_TEXT_ALIGNMENT_TRAILING);
         p.text(20,35,w-40,26,title(),18,paper,true);p.text(20,63,w-40,h-68,detail,13,muted);
         if(busy()){const float progress=float(GetTickCount64()%1800)/1800.f;p.fill(20,h-3,w-40,2,line);p.fill(20+(w-140)*progress,h-3,100,2,signal);}
     }else if(item.CtlID==launchId){

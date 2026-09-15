@@ -14,6 +14,7 @@ p.add_argument('--build', default='build')
 p.add_argument('--output', default='dist')
 p.add_argument('--iscc', required=True)
 p.add_argument('--commit', default='local')
+p.add_argument('--candidate', action='store_true', help='Package an unpublished local gameplay-test build')
 args = p.parse_args()
 if not re.fullmatch(r'\d+\.\d+\.\d+', args.version):
     raise SystemExit('Invalid version')
@@ -25,14 +26,18 @@ payload.mkdir(parents=True, exist_ok=True)
 for name in ('Lumen.exe', 'Lumen.dll'):
     shutil.copy2(build / name, payload / name)
 shutil.copytree(root / 'assets', payload / 'assets', dirs_exist_ok=True)
-for name in ('LICENSE', 'NOTICE.md', 'LATITE-ATTRIBUTION.md', 'README.md'):
+shutil.copytree(root / 'docs', payload / 'docs', dirs_exist_ok=True)
+for name in ('LICENSE', 'NOTICE.md', 'LATITE-ATTRIBUTION.md', 'README.md', 'TESTING.md'):
     shutil.copy2(root / name, payload / name)
 shutil.copy2(root / 'third_party/nlohmann/LICENSE.MIT', payload / 'JSON-LICENSE.txt')
 shutil.copy2(root / 'third_party/minhook/LICENSE.txt', payload / 'MINHOOK-LICENSE.txt')
 release_url = f'https://github.com/AuronNetwork/Lumen/releases/tag/v{args.version}'
+source_location = ('This is an unpublished local test build. The corresponding **Lumen-Source.zip**\n'
+                   'is supplied alongside this installer.' if args.candidate else
+                   f'Download **Lumen-Source.zip** from [{release_url}]({release_url}).')
 (payload / 'SOURCE.md').write_text(f'''# Corresponding source for Lumen {args.version}
 
-Download **Lumen-Source.zip** from [{release_url}]({release_url}).
+{source_location}
 It contains all application and bundled dependency source, the build scripts,
 and the GPL and dependency licenses. This source corresponds to commit
 `{args.commit}`. Build instructions are in BUILD.md.
@@ -49,7 +54,7 @@ with zipfile.ZipFile(source, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
             z.write(file, 'Lumen/' + rel.as_posix())
     z.writestr('Lumen/RELEASE-VERSION.txt', args.version + '\n')
     z.writestr('Lumen/RELEASE-COMMIT.txt', args.commit + '\n')
-manual = '''Lumen installer for Minecraft Bedrock 26.45 (Windows x64)
+manual = '''Lumen installer for Minecraft Bedrock 26.50 (Windows x64)
 
 1. Extract this ZIP.
 2. Run Lumen-Setup.exe. No administrator rights are required.
@@ -66,6 +71,11 @@ This installer is not Authenticode-signed. Windows may display an unknown
 publisher or SmartScreen warning. Release assets include SHA-256 checksums.
 Source and licenses: https://github.com/AuronNetwork/Lumen
 '''
+if args.candidate:
+    manual = ('LOCAL TEST BUILD - gameplay acceptance is pending.\n'
+              'Save and fully restart Minecraft before loading this candidate.\n'
+              'Test in a local world; see the included TESTING.md and docs/BEDROCK-26.50.md.\n'
+              'Lumen-Source.zip is supplied alongside this installer.\n\n') + manual
 bundle = out / 'Lumen-Installer.zip'
 with zipfile.ZipFile(bundle, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     z.write(out / 'Lumen-Setup.exe', 'Lumen-Setup.exe')

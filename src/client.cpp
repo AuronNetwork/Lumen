@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Bedrock 26.45 ABI/signatures adapted from Latite, commit 2271ce9.
+// Original Bedrock ABI/signatures adapted from Latite, commit 2271ce9.
+// Bedrock 26.50 layout and signature audit: docs/BEDROCK-26.50.md.
 // See NOTICE.md. No Latite runtime, plugin host, network or chat API is used.
 #include <windows.h>
 #include <commctrl.h>
@@ -17,6 +18,7 @@
 #include "view_features.h"
 #include "overlay.h"
 #include "version.h"
+#include "bedrock_version.h"
 #include "mouse_input.h"
 
 using namespace xray;
@@ -87,11 +89,17 @@ World worldUnsafe() {
     World w;
     auto main=*reinterpret_cast<void**>(platformGlobal); if(!main)return w;
     auto platform=field<void*>(main,8); if(!platform)return w;
-    auto game=field<void*>(platform,0x18); if(!game)return w;
-    const auto& clients=field<std::map<uint8_t,std::shared_ptr<void>>>(game,0x938);
-    const auto it=clients.find(0); if(it==clients.end())return w;
-    w.client=it->second.get(); if(!w.client)return w;
-    w.captured=field<bool>(game,0x1D8);
+    auto app=field<void*>(platform,0x20); if(!app)return w;
+    auto game=field<void*>(app,0x48); if(!game)return w;
+    // 26.50 map values contain an interface pointer before the owning client
+    // pointer. Do not reinterpret the map as std::map<uint8_t, shared_ptr<void>>.
+    auto head=field<void*>(game,0x970);if(!head)return w;
+    auto first=field<void*>(head,0);if(!first||first==head)return w;
+    if(field<uint8_t>(head,0x19)!=1||field<uint8_t>(first,0x19)!=0)return {};
+    if(field<uint8_t>(first,0x20)!=0)return w;
+    w.client=field<void*>(first,0x30); if(!w.client)return w;
+    if(field<void*>(w.client,0x1A8)!=game)return {};
+    w.captured=field<bool>(game,0x1E8);
     w.player=call<void*>(w.client,0x1F); if(!w.player)return w;
     auto state=field<void*>(w.player,0x218); if(!state)return w;
     w.pos=field<Vec3>(state,0);
@@ -338,8 +346,9 @@ bool correctVersion() {
     std::vector<uint8_t> data(size);if(!GetFileVersionInfoW(path,0,size,data.data()))return false;
     VS_FIXEDFILEINFO* info{};UINT length{};
     if(!VerQueryValueW(data.data(),L"\\",reinterpret_cast<void**>(&info),&length))return false;
-    log("Minecraft version "+std::to_string(HIWORD(info->dwFileVersionMS))+"."+std::to_string(LOWORD(info->dwFileVersionMS))+"."+std::to_string(HIWORD(info->dwFileVersionLS)));
-    return HIWORD(info->dwFileVersionMS)==1&&LOWORD(info->dwFileVersionMS)==26&&HIWORD(info->dwFileVersionLS)==45;
+    if(length<sizeof(VS_FIXEDFILEINFO)||info->dwSignature!=VS_FFI_SIGNATURE)return false;
+    log("Minecraft version "+std::to_string(HIWORD(info->dwFileVersionMS))+"."+std::to_string(LOWORD(info->dwFileVersionMS))+"."+std::to_string(HIWORD(info->dwFileVersionLS))+"."+std::to_string(LOWORD(info->dwFileVersionLS)));
+    return lumen::supportedBedrock(HIWORD(info->dwFileVersionMS),LOWORD(info->dwFileVersionMS),HIWORD(info->dwFileVersionLS),LOWORD(info->dwFileVersionLS));
 }
 void hook(uintptr_t address,void* target,void** original) {
     const auto result=MH_CreateHook(reinterpret_cast<void*>(address),target,original);
@@ -348,18 +357,18 @@ void hook(uintptr_t address,void* target,void** original) {
 void initializeHooks() {
     if(GetModuleHandleW(L"XrayLight.dll"))throw std::runtime_error("Xray Light is still loaded. Restart Minecraft before loading Lumen.");
     if(GetModuleHandleW(L"Latite.dll")||GetModuleHandleW(L"LatiteNightly.dll")||GetModuleHandleW(L"LatiteDebug.dll"))throw std::runtime_error("Latite is already loaded. Restart Minecraft without Latite.");
-    if(!correctVersion())throw std::runtime_error("Only Minecraft Bedrock 26.45 is supported.");
+    if(!correctVersion())throw std::runtime_error("This Lumen build requires Minecraft Bedrock 26.50 (Windows package 1.26.5004.0).");
     platformGlobal=signature("4C 89 3D ? ? ? ? 4D 85 FF",3);
     materialGroup=signature("48 8D 15 ? ? ? ? 4C 8D 45 ? E8 ? ? ? ? 48 8D 4D ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? E9 ? ? ? ? 48 8D 0D",3);
     tessBegin=signature("56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 80 B9 ? ? ? ? ? 0F 85 ? ? ? ? 80 B9");
     tessColor=signature("80 B9 ? ? ? ? ? 0F 85 ? ? ? ? F3 0F 10 05 ? ? ? ? F3 0F 10 0A");
     tessVertex=signature("55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 4D ? 44 0F 29 45 ? 0F 29 7D ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 0F 28 F3 0F 28 FA 44 0F 28 C1 48 89 CE 48 8B 0D");
     meshRender=signature("55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 80 BA ? ? ? ? ? 0F 85 ? ? ? ? 4C 89 CF");
-    const auto tickAddress=signature("55 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 6D");
+    const auto tickAddress=signature("55 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 6D 40 44 0F 29 65 30 44 0F 29 5D 20");
     const auto renderAddress=signature("E8 ? ? ? ? 45 31 E4 48 83 BE",1);
     const auto windowAddress=signature("55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 89 D6 4C 8B 3D");
     const auto levelTable=signature("48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 BD",3);
-    const auto gammaAddress=signature("48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 35 00 00 00");
+    const auto gammaAddress=signature("48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 32 00 00 00");
     grabCursor=signature("56 48 83 EC ? 48 89 CE 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74 ? 48 8B 8E ? ? ? ? 48 8B 01 48 8B 80 ? ? ? ? 48 8B 15 ? ? ? ? 48 83 C4 ? 5E 48 FF E2 90 48 83 C4 ? 5E C3 CC CC CC CC CC CC CC CC CC CC CC CC CC 56 48 83 EC");
     releaseCursor=signature("56 48 83 EC ? 48 89 CE 48 8B 01 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74 ? 48 8B 8E ? ? ? ? 48 8B 01 48 8B 80 ? ? ? ? 48 8B 15 ? ? ? ? 48 83 C4 ? 5E 48 FF E2 90 48 83 C4 ? 5E C3 CC CC CC CC CC CC CC CC CC CC CC CC CC 56 53");
     mouseGlobal=signature("89 15 ? ? ? ? C7 47",2);

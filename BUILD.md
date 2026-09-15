@@ -6,12 +6,12 @@ Requirements: Windows x64, Visual Studio 2022 C++ tools, Windows SDK, CMake
 From the repository root:
 
 ```powershell
-cmake -S . -B build -A x64 "-DLUMEN_VERSION=1.4.0"
+cmake -S . -B build -A x64 "-DLUMEN_VERSION=1.5.0"
 cmake --build build --config Release --parallel 4
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-For a source ZIP, replace 1.4.0 with the version in RELEASE-VERSION.txt.
+For a source ZIP, replace 1.5.0 with the version in RELEASE-VERSION.txt.
 The default updater repository is AuronNetwork/Lumen. Forks can set
 `-DLUMEN_REPOSITORY=owner/repository`; adapt installer/package URLs as well
 before distributing a fork. Never point another project's updater at Lumen.
@@ -31,7 +31,7 @@ Build first, then run in PowerShell:
 
 ```powershell
 $iscc = & ./scripts/bootstrap-inno.ps1
-python scripts/package.py --version 1.4.0 --build build/Release --iscc $iscc --commit (git rev-parse HEAD)
+python scripts/package.py --version 1.5.0 --build build/Release --iscc $iscc --commit (git rev-parse HEAD)
 ```
 
 For Ninja use `--build build`. The bootstrap pins Inno Setup 7.1.0, validates
@@ -48,7 +48,7 @@ not installed.
 
 .github/workflows/release.yml publishes a complete release after a successful
 push to main. Version 1.4.<github.run_number> is compiled into both binaries,
-their Windows resources and the installer. Components must fit 0–65535.
+their Windows resources and the installer. Components must fit 0â€“65535.
 To start a new version series, update the workflow prefix and CMake default.
 
 Build/test jobs have read-only repository permissions. Only the publication

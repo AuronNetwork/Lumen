@@ -95,7 +95,7 @@ void draw(HWND window,UINT width,UINT height){
     dc->SetTransform(D2D1::Matrix3x2F::Identity());fill(0,0,float(width),float(height),ink,0.14f);
     dc->SetTransform(D2D1::Matrix3x2F::Scale(scale,scale)*D2D1::Matrix3x2F::Translation(ox,oy));
     fill(5,10,920,728,ink,0.32f,20);fill(0,0,920,728,ink,0.92f,20);border(0,0,920,728,0x45443c,0.7f,20);
-    text(30,27,400,42,L"LUMEN",30,paper,true);text(30,72,550,18,L"AURON NETWORK  /  BEDROCK 26.45",10,signal,true);
+    text(30,27,400,42,L"LUMEN",30,paper,true);text(30,72,550,18,L"AURON NETWORK  /  BEDROCK 26.50",10,signal,true);
     text(590,30,300,18,L"YOUR WORLD. CLEARER.",11,muted,false,true);
     text(590,54,300,24,L"INSERT  /  ESC   Close",12,paper,false,true);
     if(clicked&&hit(590,48,300,35))changeState(Close,0);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-set(LUMEN_VERSION "1.4.0" CACHE STRING "Release version")
+set(LUMEN_VERSION "1.5.0" CACHE STRING "Release version")
 set(LUMEN_REPOSITORY "AuronNetwork/Lumen" CACHE STRING "GitHub update repository")
 if(NOT LUMEN_VERSION MATCHES "^[0-9]+[.][0-9]+[.][0-9]+$")
   message(FATAL_ERROR "LUMEN_VERSION must contain major.minor.patch; quote -D arguments in PowerShell")
@@ -58,3 +58,7 @@ target_compile_definitions(updater_io_tests PRIVATE UNICODE _UNICODE WIN32_LEAN_
 target_compile_options(updater_io_tests PRIVATE /W4 /EHsc /utf-8)
 target_link_libraries(updater_io_tests PRIVATE winhttp bcrypt)
 add_test(NAME updater_hash COMMAND updater_io_tests)
+
+add_executable(bedrock_version_tests tests/bedrock_version_tests.cpp)
+target_compile_options(bedrock_version_tests PRIVATE /W4 /EHsc /utf-8)
+add_test(NAME bedrock_version COMMAND bedrock_version_tests)
