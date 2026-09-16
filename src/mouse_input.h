@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 namespace lumen {
-// Bedrock 26.50 MouseDevice event layout, adapted from Latite.
+// Bedrock 26.51 MouseDevice event layout, adapted from Latite.
 struct MouseAction {int16_t x,y,dx,dy;int8_t action,data;int pointerId;bool motionless;};
 static_assert(sizeof(MouseAction)==20 && offsetof(MouseAction,pointerId)==12);
 inline void consumeMouseButtons(std::vector<MouseAction>& inputs){

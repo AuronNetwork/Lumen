@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-set(LUMEN_VERSION "1.5.0" CACHE STRING "Release version")
+set(LUMEN_VERSION "1.5.1" CACHE STRING "Release version")
 set(LUMEN_REPOSITORY "AuronNetwork/Lumen" CACHE STRING "GitHub update repository")
 if(NOT LUMEN_VERSION MATCHES "^[0-9]+[.][0-9]+[.][0-9]+$")
   message(FATAL_ERROR "LUMEN_VERSION must contain major.minor.patch; quote -D arguments in PowerShell")

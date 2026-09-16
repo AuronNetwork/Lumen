@@ -54,7 +54,7 @@ with zipfile.ZipFile(source, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
             z.write(file, 'Lumen/' + rel.as_posix())
     z.writestr('Lumen/RELEASE-VERSION.txt', args.version + '\n')
     z.writestr('Lumen/RELEASE-COMMIT.txt', args.commit + '\n')
-manual = '''Lumen installer for Minecraft Bedrock 26.50 (Windows x64)
+manual = '''Lumen installer for Minecraft Bedrock 26.51 (Windows x64)
 
 1. Extract this ZIP.
 2. Run Lumen-Setup.exe. No administrator rights are required.
@@ -74,7 +74,7 @@ Source and licenses: https://github.com/AuronNetwork/Lumen
 if args.candidate:
     manual = ('LOCAL TEST BUILD - gameplay acceptance is pending.\n'
               'Save and fully restart Minecraft before loading this candidate.\n'
-              'Test in a local world; see the included TESTING.md and docs/BEDROCK-26.50.md.\n'
+              'Test in a local world; see the included TESTING.md and docs/BEDROCK-26.51.md.\n'
               'Lumen-Source.zip is supplied alongside this installer.\n\n') + manual
 bundle = out / 'Lumen-Installer.zip'
 with zipfile.ZipFile(bundle, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:

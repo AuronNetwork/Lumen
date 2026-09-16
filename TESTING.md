@@ -1,10 +1,13 @@
 # Validation and acceptance limits
 
-The 1.5.0 candidate updates the integration for Minecraft Bedrock 26.50,
-Windows package 1.26.5004.0. All 16 final signatures are unique in the installed
-running module, and the changed ownership/map/cursor layouts were checked with
-read-only inspection. The build and all six CTest cases pass. A clean-process
-gameplay test is pending; see [the audit](docs/BEDROCK-26.50.md).
+The 1.5.1 candidate targets Minecraft Bedrock 26.51, Windows package
+1.26.5101.0 (file version 1.26.51.1). All 16 signatures are unique in the
+installed running module. Read-only inspection confirmed the ownership, map,
+actor, block, camera and gamma layouts from the 26.50 candidate. Sampled native
+instruction sequences match after masking relative addresses. The build and all
+six CTest cases pass. A clean-process gameplay test is pending; see
+[the 26.51 audit](docs/BEDROCK-26.51.md). The earlier 26.50 candidate did not
+receive gameplay acceptance before this hotfix arrived.
 
 The release workflow builds the native x64 programs, runs the scanner,
 view/projection/gamma, mouse, update-policy, SHA-256 and exact Bedrock-version

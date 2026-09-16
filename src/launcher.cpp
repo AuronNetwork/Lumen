@@ -47,9 +47,9 @@ DWORD WINAPI start(void*) {
     DWORD pid=minecraft();
     if(!pid){
         status(L"Starting Minecraft. Waiting for the main menu ...");
-        if(reinterpret_cast<INT_PTR>(ShellExecuteW(nullptr,L"open",L"minecraft://",nullptr,nullptr,SW_SHOWNORMAL))<=32){finish(L"Could not open Minecraft. Start Minecraft 26.50 and try again.");return 0;}
+        if(reinterpret_cast<INT_PTR>(ShellExecuteW(nullptr,L"open",L"minecraft://",nullptr,nullptr,SW_SHOWNORMAL))<=32){finish(L"Could not open Minecraft. Start Minecraft 26.51 and try again.");return 0;}
         for(int i=0;i<120&&!pid;++i){Sleep(1000);pid=minecraft();}
-        if(!pid){finish(L"Could not find a single Minecraft process. Run one instance of Minecraft 26.50 and try again.");return 0;}
+        if(!pid){finish(L"Could not find a single Minecraft process. Run one instance of Minecraft 26.51 and try again.");return 0;}
         Sleep(5000);
     }
     const auto loaded=modules(pid);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Original Bedrock ABI/signatures adapted from Latite, commit 2271ce9.
-// Bedrock 26.50 layout and signature audit: docs/BEDROCK-26.50.md.
+// Bedrock 26.51 layout and signature audit: docs/BEDROCK-26.51.md.
 // See NOTICE.md. No Latite runtime, plugin host, network or chat API is used.
 #include <windows.h>
 #include <commctrl.h>
@@ -357,7 +357,7 @@ void hook(uintptr_t address,void* target,void** original) {
 void initializeHooks() {
     if(GetModuleHandleW(L"XrayLight.dll"))throw std::runtime_error("Xray Light is still loaded. Restart Minecraft before loading Lumen.");
     if(GetModuleHandleW(L"Latite.dll")||GetModuleHandleW(L"LatiteNightly.dll")||GetModuleHandleW(L"LatiteDebug.dll"))throw std::runtime_error("Latite is already loaded. Restart Minecraft without Latite.");
-    if(!correctVersion())throw std::runtime_error("This Lumen build requires Minecraft Bedrock 26.50 (Windows package 1.26.5004.0).");
+    if(!correctVersion())throw std::runtime_error("This Lumen build requires Minecraft Bedrock 26.51 (Windows package 1.26.5101.0).");
     platformGlobal=signature("4C 89 3D ? ? ? ? 4D 85 FF",3);
     materialGroup=signature("48 8D 15 ? ? ? ? 4C 8D 45 ? E8 ? ? ? ? 48 8D 4D ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? E9 ? ? ? ? 48 8D 0D",3);
     tessBegin=signature("56 57 55 53 48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 80 B9 ? ? ? ? ? 0F 85 ? ? ? ? 80 B9");
