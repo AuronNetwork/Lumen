@@ -5,7 +5,7 @@
 A lightweight Windows client for **Minecraft Bedrock 26.51** with Xray, Zoom,
 Fullbright and an Auron-styled in-game menu. Lumen runs independently of Latite.
 
-The 1.5.1 candidate targets Windows package **1.26.5101.0** (executable **1.26.51.1**).
+Current releases target Windows package **1.26.5101.0** (executable **1.26.51.1**).
 See [the 26.51 audit and acceptance status](docs/BEDROCK-26.51.md).
 
 [Download the installer ZIP](https://github.com/AuronNetwork/Lumen/releases/latest/download/Lumen-Installer.zip)

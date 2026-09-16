@@ -77,6 +77,8 @@ jobs:
           $notes = @"
           Lumen $env:LUMEN_VERSION for Minecraft Bedrock 26.51 on Windows x64.
 
+          Updated for Windows package **1.26.5101.0** (executable **1.26.51.1**). Xray, ore filters, Zoom, Fullbright, the in-game menu/mouse and world re-entry were confirmed by the tester on the 1.5.1 candidate. This release retains that gameplay code.
+
           Download **Lumen-Installer.zip**, extract it and run **Lumen-Setup.exe**.
           Installed copies check for updates when the launcher opens. Save and close Minecraft before an update; the installer never closes the game for you.
 

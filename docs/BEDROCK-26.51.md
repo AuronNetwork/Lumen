@@ -2,8 +2,9 @@
 
 Target: Windows x64 package **1.26.5101.0**, executable file version
 **1.26.51.1**. Inspected on September 16, 2026. This hotfix follows the
-[26.50 integration update](BEDROCK-26.50.md). Lumen 1.5.1 is an unpublished
-local candidate pending gameplay acceptance.
+[26.50 integration update](BEDROCK-26.50.md). The user accepted the Lumen 1.5.1
+local candidate in gameplay on September 16, 2026. Public 1.5 releases retain
+that gameplay code and receive their release version from CI.
 
 ## Verified compatibility
 
@@ -54,17 +55,22 @@ builds, other revisions and package-version components passed as file versions.
 The installer and matching source ZIP have been built and archive-checked.
 
 The 26.50 candidate was not accepted in gameplay before this hotfix arrived.
-Neither that candidate nor this update has been published to the stable updater.
-A clean-process local-world test is still required:
+For the 1.5.1 candidate, the user was asked to fully restart Minecraft and test
+in a local world: Xray and ore filters, C hold/release, B on/off, Insert/Escape
+with usable mouse, and leaving/re-entering the world. On September 16, 2026,
+the user confirmed that everything works. This is user-reported acceptance of
+that checklist, separate from the read-only audit and automated checks above.
+It is not an independently observed visual test or a separate confirmation of
+non-operator behavior or the entire automatic-update handoff.
 
-1. Save and fully close Minecraft, install this candidate, then start it through
-   Lumen. The old DLL remains loaded even after its version check fails.
-2. Check Xray, ore filters and drawing while moving through the world.
-3. Hold/release C and toggle B on/off; verify normal view restoration.
-4. Open/close Insert and Escape; check cursor, sliders and input capture without
-   opening Minecraft's pause menu or causing unintended block interaction.
-5. Leave/re-enter the world and confirm normal operation. Separately verify
-   non-operator behavior before claiming its acceptance.
+The local runtime log from the fresh 16:40:21 startup reports Minecraft
+1.26.51.1 and READY Lumen 1.5.1, followed by RENDER_OK (ore boxes), ZOOM_RENDER_OK,
+FULLBRIGHT_GAMMA_OK and menu open/close events with blocked game cursor grabs.
+There is no error entry in that startup segment through 16:41:18. These records
+confirm the feature paths executed; the visual result is supported by the
+user's report.
 
-Existing settings are preserved. A successful compile, signature scan or memory
-read does not replace these gameplay checks.
+The public release retains the accepted candidate's gameplay code. CI rebuilds
+it with the release version and runs the automated tests and isolated installer
+lifecycle checks. Existing settings are preserved. Fully restart Minecraft
+before loading an update: an old DLL remains loaded even after version rejection.
