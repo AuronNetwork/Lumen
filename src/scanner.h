@@ -20,16 +20,25 @@ struct PosHash {
                (uint64_t(uint32_t(p.y)) * 0xc2b2ae3d27d4eb4fULL) ^ uint32_t(p.z);
     }
 };
-inline constexpr std::array<const wchar_t*, 10> names = {
+inline constexpr int oreCount = 10;
+enum BlockKind { Chest = oreCount, TrappedChest, EnderChest, blockCount };
+inline constexpr unsigned supportedMask = (1u << blockCount) - 1;
+inline constexpr std::array<const wchar_t*, blockCount> names = {
     L"Diamond", L"Emerald", L"Gold", L"Iron", L"Redstone", L"Lapis Lazuli",
-    L"Coal", L"Copper", L"Quartz", L"Ancient Debris"};
-inline constexpr std::array<Color, 10> colors = {{
+    L"Coal", L"Copper", L"Quartz", L"Ancient Debris",
+    L"Chests", L"Trapped Chests", L"Ender Chests"};
+inline constexpr std::array<Color, blockCount> colors = {{
     {.1f,1,1}, {.1f,1,.3f}, {1,.8f,.1f}, {1,.7f,.5f}, {1,.15f,.15f},
-    {.25f,.4f,1}, {.65f,.65f,.65f}, {1,.45f,.2f}, {.95f,.95f,1}, {.8f,.35f,1}}};
+    {.25f,.4f,1}, {.65f,.65f,.65f}, {1,.45f,.2f}, {.95f,.95f,1}, {.8f,.35f,1},
+    {1,.70f,.28f}, {1,.42f,.42f}, {.69f,.58f,1}}};
+// Keep the existing ten ore bits and defaults: new chest filters are opt-in.
 inline constexpr unsigned defaultMask = (1<<0)|(1<<1)|(1<<2)|(1<<3)|(1<<9);
 inline int classify(std::string_view name) {
     if (!name.starts_with("minecraft:")) return -1;
     name.remove_prefix(10);
+    if (name == "chest") return Chest;
+    if (name == "trapped_chest") return TrappedChest;
+    if (name == "ender_chest") return EnderChest;
     if (name == "ancient_debris") return 9;
     if (name.starts_with("lit_")) name.remove_prefix(4);
     if (name.starts_with("deepslate_")) name.remove_prefix(10);
@@ -38,6 +47,9 @@ inline int classify(std::string_view name) {
         "redstone_ore","lapis_ore","coal_ore","copper_ore","quartz_ore"};
     for (int i=0;i<9;++i) if(name==ores[i]) return i;
     return -1;
+}
+inline constexpr bool selected(unsigned mask, int kind) {
+    return kind >= 0 && kind < blockCount && (mask & (1u << kind)) != 0;
 }
 inline int dist2(Pos a, Pos b) {
     // The scanner only keeps nearby positions; use double before squaring to
@@ -72,12 +84,12 @@ public:
         int used=0;
         auto query=[&](Pos p) {
             const int ore=read(p); ++used; ++reads;
-            if(ore>=0 && (selected&(1u<<ore))) {
+            if(xray::selected(selected,ore)) {
                 if(found.size()<4096 || found.contains(p)) found[p]=ore;
             } else found.erase(p);
         };
-        // Revisit known ores within the same total read budget, including
-        // mined blocks. Copy positions because query may erase an entry.
+        // Revisit known blocks within the same total read budget, including
+        // removed chests and mined ores. Copy positions because query may erase an entry.
         std::vector<Pos> keys;
         keys.reserve(found.size());
         for(const auto& [p,ore]:found) { (void)ore; keys.push_back(p); }

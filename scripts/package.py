@@ -74,7 +74,7 @@ Source and licenses: https://github.com/AuronNetwork/Lumen
 if args.candidate:
     manual = ('LOCAL TEST BUILD - gameplay acceptance is pending.\n'
               'Save and fully restart Minecraft before loading this candidate.\n'
-              'Test in a local world; see the included TESTING.md and docs/BEDROCK-26.51.md.\n'
+              'Test in a local world; see the included TESTING.md and docs/CHEST-XRAY.md.\n'
               'Lumen-Source.zip is supplied alongside this installer.\n\n') + manual
 bundle = out / 'Lumen-Installer.zip'
 with zipfile.ZipFile(bundle, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:

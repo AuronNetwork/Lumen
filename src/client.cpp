@@ -205,7 +205,7 @@ void tick(void* level) {
         snapshot=scanner.visible(center,maxBoxes.load());
         readCount=scanner.reads;sweepCount=scanner.sweeps;boxCount=snapshot.size();
         static bool first=false;
-        if(!first && scanner.sweeps>0){first=true;log("SCAN_OK reads="+std::to_string(scanner.reads)+" ores="+std::to_string(snapshot.size()));}
+        if(!first && scanner.sweeps>0){first=true;log("SCAN_OK reads="+std::to_string(scanner.reads)+" blocks="+std::to_string(snapshot.size()));}
     } catch(const std::exception& e){fail(e.what());}
 }
 struct HashedString {
@@ -387,7 +387,7 @@ void initializeHooks() {
         overlay::initialize(dll,uiState,uiChange,log);
         if(MH_EnableHook(MH_ALL_HOOKS)!=MH_OK)throw std::runtime_error("Hook activation failed");
     } catch(...) {MH_DisableHook(MH_ALL_HOOKS);MH_Uninitialize();throw;}
-    ready=true;log("READY Lumen " LUMEN_VERSION "; in-game overlay; cursor capture fix; Xray/Zoom/Fullbright; no OP requirement; no Latite/Chakra");
+    ready=true;log("READY Lumen " LUMEN_VERSION "; in-game overlay; cursor capture fix; Ore/Chest Xray/Zoom/Fullbright; no OP requirement; no Latite/Chakra");
 }
 void saveSettings() {
     auto save=[](const wchar_t* key,int value){WritePrivateProfileStringW(L"Xray",key,std::to_wstring(value).c_str(),configPath.c_str());};
@@ -400,7 +400,7 @@ overlay::State uiState(){
     if(fault)state.status=L"Xray stopped. See lumen.log for details.";
     else if(viewFault)state.status=L"Zoom stopped. See lumen.log for details.";
     else if(!enabled)state.status=L"Xray is off. Press X or use the toggle to enable it.";
-    else state.status=std::to_wstring(boxCount.load())+L" ores marked · "+std::to_wstring(readCount.load())+L" queries";
+    else state.status=std::to_wstring(boxCount.load())+L" blocks marked · "+std::to_wstring(readCount.load())+L" queries";
     return state;
 }
 void uiChange(overlay::Command command,int value){
@@ -412,7 +412,7 @@ void uiChange(overlay::Command command,int value){
     case overlay::Zoom:zoomEnabled=value!=0;zoomHeld=false;break;
     case overlay::Brightness:fullbright=value!=0;log(fullbright?"FULLBRIGHT_ON":"FULLBRIGHT_OFF");break;
     case overlay::ZoomFactor:zoomFactor=std::clamp(value,2,20);break;
-    case overlay::Ore:if(value>=0&&value<10){oreMask.fetch_xor(1u<<value);revision++;}break;
+    case overlay::Ore:if(value>=0&&value<blockCount){oreMask.fetch_xor(1u<<value);revision++;}break;
     case overlay::Close:closeRequested=true;break;
     }
     if(settings)PostMessageW(settings,WM_APP+3,0,0);
@@ -444,7 +444,8 @@ DWORD WINAPI worker(void*) {
     log("START pid="+std::to_string(GetCurrentProcessId()));
     radius=std::clamp(int(GetPrivateProfileIntW(L"Xray",L"Radius",16,configPath.c_str())),4,24);
     maxBoxes=std::clamp(int(GetPrivateProfileIntW(L"Xray",L"MaxBoxes",256,configPath.c_str())),32,512);
-    oreMask=GetPrivateProfileIntW(L"Xray",L"Ores",defaultMask,configPath.c_str())&1023;
+    // Retain the Ores key and its original bits when extending it with chest filters.
+    oreMask=GetPrivateProfileIntW(L"Xray",L"Ores",defaultMask,configPath.c_str())&supportedMask;
     through=GetPrivateProfileIntW(L"Xray",L"Through",1,configPath.c_str())!=0;
     fullbright=GetPrivateProfileIntW(L"Xray",L"Fullbright",0,configPath.c_str())!=0;
     zoomEnabled=GetPrivateProfileIntW(L"Xray",L"ZoomEnabled",1,configPath.c_str())!=0;

@@ -2,7 +2,7 @@
 
 # Lumen
 
-A lightweight Windows client for **Minecraft Bedrock 26.51** with Xray, Zoom,
+A lightweight Windows client for **Minecraft Bedrock 26.51** with ore/chest Xray, Zoom,
 Fullbright and an Auron-styled in-game menu. Lumen runs independently of Latite.
 
 Current releases target Windows package **1.26.5101.0** (executable **1.26.51.1**).
@@ -36,8 +36,17 @@ with each release.
 | Hold C | Zoom; release to restore the normal view |
 | B | Toggle Fullbright |
 
-The menu supports ore filters, a 4–24 block radius, 32–512 markers and 2×–20×
-zoom. Settings save automatically. The menu does not pause the world.
+The menu supports ore and chest filters, a 4–24 block radius, 32–512 markers and
+2×–20× zoom. Settings save automatically. The menu does not pause the world.
+
+The 1.6.0 candidate adds **Chest Filters** below the ore filters: **Chests**,
+**Trapped Chests** and **Ender Chests**. Enable Xray with X and select the types
+you want to mark; **Show through walls** controls visibility through blocks.
+Chest markers use amber, coral and lavender outlines respectively, sharing the
+radius and nearest-first marker limit with ores. A double chest occupies two
+marked block positions. Only chest locations are displayed, not their contents.
+Existing ore selections are preserved; chest filters start off and save when
+changed. See [chest Xray validation](docs/CHEST-XRAY.md) for current test status.
 
 All three features work on the client; no OP permission or chat command is
 needed. Xray can only inspect block data the server actually sends. It cannot
@@ -67,7 +76,7 @@ Enabled=0
 ## Development and releases
 
 Every push to **main** builds and tests on Windows. A successful current build
-publishes a release numbered `1.4.<workflow run number>`. Pull requests build
+publishes a release numbered `1.6.<workflow run number>`. Pull requests build
 and test without publishing. Incomplete uploads remain drafts and are not
 eligible for automatic updates. Older queued commits cannot replace a newer
 main build as the latest release.

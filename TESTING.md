@@ -1,5 +1,20 @@
 # Validation and acceptance limits
 
+## Chest Xray candidate (1.6.0)
+
+The candidate adds independent chest, trapped-chest and ender-chest filters to
+the existing Bedrock 26.51 scanner and overlay. No game hooks, offsets or version
+gate changed. Automated scanner coverage includes mixed ore/chest selection,
+adjacent double-chest halves, shared limits, removal/replacement and invalid IDs.
+The native x64 build and all six CTest cases pass. Offscreen renders of the
+production menu at 1280x720 and 1280x900 confirm the filter labels fit without
+clipping or overlapping controls; these use sample state and do not test input.
+The previous gameplay acceptance below predates this feature. The new chest
+markers, settings retention and filter interaction need a clean-process local
+world test; see [the checklist](docs/CHEST-XRAY.md).
+
+## Bedrock 26.51 baseline (1.5 series)
+
 The 1.5.1 candidate targets Minecraft Bedrock 26.51, Windows package
 1.26.5101.0 (file version 1.26.51.1). All 16 signatures are unique in the
 installed running module. Read-only inspection confirmed the ownership, map,

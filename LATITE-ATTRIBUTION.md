@@ -6,6 +6,8 @@ an independent [26.50 compatibility update](docs/BEDROCK-26.50.md). Updated
 ownership/map/cursor layouts and tick/gamma signatures are local Lumen changes.
 The [26.51 hotfix audit](docs/BEDROCK-26.51.md) verifies these retained layouts
 against executable 1.26.51.1; it introduces no additional Latite code.
+The 1.6 series adds [chest filters](docs/CHEST-XRAY.md) to Lumen's local block
+classifier and overlay, retaining the same native interfaces and signatures.
 Reviewed on **September 14, 2026**.
 
 **Lumen is a standalone client built using selected Latite source code and

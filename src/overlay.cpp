@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // DirectX interop approach adapted from Latite and Microsoft's D3D11On12 sample.
 #include "overlay.h"
+#include "scanner.h"
 #include <MinHook.h>
 #include <d3d11.h>
 #include <d3d12.h>
@@ -82,6 +83,13 @@ void slider(float x,float y,float w,int value,int lo,int hi,Command command,int 
     const float pos=w*float(value-lo)/float(hi-lo);fill(x,y,w,4,line,1,2);fill(x,y,pos,4,signal,1,2);
     fill(x+pos-5,y-3,10,10,paper,1,5);
 }
+void filter(float x,float y,int kind,unsigned mask){
+    const bool active=xray::selected(mask,kind),hover=hit(x,y,142,30);
+    fill(x,y,142,30,active?signal:ink,active?(hover?0.16f:0.07f):0.22f,7);
+    border(x,y,142,30,active||hover?signal:line,active?0.8f:1.f,7);
+    text(x+12,y+6,118,22,xray::names[kind],12,active?signal:muted,true);
+    if(clicked&&hover)changeState(Ore,kind);
+}
 void draw(HWND window,UINT width,UINT height){
     auto state=readState();
     const float scale=std::min({float(width)/1020.f,float(height)/820.f,1.25f});
@@ -101,22 +109,17 @@ void draw(HWND window,UINT width,UINT height){
     if(clicked&&hit(590,48,300,35))changeState(Close,0);
     fill(30,108,498,540,panel,0.90f,14);fill(548,108,342,264,panel,0.90f,14);fill(548,390,342,258,panel,0.90f,14);
     text(52,132,390,28,L"Xray",18,paper,true);toggle(462,130,state.xray,Xray);
-    text(52,170,454,22,L"Discover what lies beneath the surface.",12,muted);
+    text(52,170,454,22,L"Reveal nearby ores and chests.",12,muted);
     text(52,202,340,24,L"Radius");text(390,202,116,24,std::to_wstring(state.radius)+L" blocks",14,signal,true,true);
     slider(52,234,454,state.radius,4,24,Radius);
     text(52,252,340,24,L"Markers");text(390,252,116,24,std::to_wstring(state.limit),14,signal,true,true);
     slider(52,284,454,state.limit,32,512,Limit,32);
     text(52,324,390,28,L"Show through walls");toggle(462,322,state.walls,Walls);
     text(52,362,400,20,L"ORE FILTERS",10,muted,true);
-    static const wchar_t* names[]={L"Diamond",L"Emerald",L"Gold",L"Iron",L"Redstone",L"Lapis",L"Coal",L"Copper",L"Quartz",L"Ancient Debris"};
-    for(int i=0;i<10;i++){
-        const float x=52.f+(i%3)*156.f,y=386.f+(i/3)*36.f;const bool active=(state.ores&(1u<<i))!=0;
-        const bool hover=hit(x,y,142,30);fill(x,y,142,30,active?signal:ink,active?(hover?0.16f:0.07f):0.22f,7);
-        border(x,y,142,30,active||hover?signal:line,active?0.8f:1.f,7);
-        text(x+12,y+6,118,22,names[i],12,active?signal:muted,true);
-        if(clicked&&hover)changeState(Ore,i);
-    }
-    text(52,577,454,48,state.status,12,muted);
+    for(int i=0;i<xray::oreCount;i++)filter(52.f+(i%3)*156.f,386.f+(i/3)*36.f,i,state.ores);
+    text(52,534,454,20,L"CHEST FILTERS",10,muted,true);
+    for(int i=xray::Chest;i<xray::blockCount;i++)filter(52.f+(i-xray::Chest)*156.f,558.f,i,state.ores);
+    text(52,606,454,32,state.status,12,muted);
     text(570,132,230,28,L"Zoom",18,paper,true);toggle(824,130,state.zoom,Zoom);
     text(570,174,298,24,L"Get closer with a single key.",12,muted);
     text(570,208,225,26,L"Magnification");text(803,208,65,26,std::to_wstring(state.zoomFactor)+L"×",14,signal,true,true);
