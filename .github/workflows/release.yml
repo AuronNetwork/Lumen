@@ -79,6 +79,8 @@ jobs:
 
           Updated for Windows package **1.26.5101.0** (executable **1.26.51.1**). Adds independently selectable chest, trapped-chest and ender-chest Xray filters alongside the existing ore filters. See TESTING.md and docs/CHEST-XRAY.md for the feature acceptance status.
 
+          Open **Insert → Chest Filters**, select the chest types and enable **Xray** and **Show through walls**. Existing ore selections are preserved; chest filters start off. The tester confirmed chest visibility, removal refresh and saved filters on the 1.6.0 candidate. This release retains that feature code.
+
           Download **Lumen-Installer.zip**, extract it and run **Lumen-Setup.exe**.
           Installed copies check for updates when the launcher opens. Save and close Minecraft before an update; the installer never closes the game for you.
 

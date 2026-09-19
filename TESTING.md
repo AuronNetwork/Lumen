@@ -1,17 +1,20 @@
 # Validation and acceptance limits
 
-## Chest Xray candidate (1.6.0)
+## Chest Xray acceptance (1.6 series)
 
-The candidate adds independent chest, trapped-chest and ender-chest filters to
+The 1.6.0 candidate adds independent chest, trapped-chest and ender-chest filters to
 the existing Bedrock 26.51 scanner and overlay. No game hooks, offsets or version
 gate changed. Automated scanner coverage includes mixed ore/chest selection,
 adjacent double-chest halves, shared limits, removal/replacement and invalid IDs.
 The native x64 build and all six CTest cases pass. Offscreen renders of the
 production menu at 1280x720 and 1280x900 confirm the filter labels fit without
 clipping or overlapping controls; these use sample state and do not test input.
-The previous gameplay acceptance below predates this feature. The new chest
-markers, settings retention and filter interaction need a clean-process local
-world test; see [the checklist](docs/CHEST-XRAY.md).
+On September 19, 2026, the user reported that the requested chest test passed:
+normal, trapped and ender chests marked behind walls, removed chests disappearing,
+and filter selections retained after restart. This is user-reported acceptance
+of the 1.6.0 candidate, not an independently observed gameplay test. Public 1.6
+releases retain that candidate's feature code, with version metadata supplied by
+CI. See [the checklist and limits](docs/CHEST-XRAY.md).
 
 ## Bedrock 26.51 baseline (1.5 series)
 

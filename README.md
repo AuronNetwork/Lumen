@@ -39,7 +39,7 @@ with each release.
 The menu supports ore and chest filters, a 4–24 block radius, 32–512 markers and
 2×–20× zoom. Settings save automatically. The menu does not pause the world.
 
-The 1.6.0 candidate adds **Chest Filters** below the ore filters: **Chests**,
+The 1.6 series adds **Chest Filters** below the ore filters: **Chests**,
 **Trapped Chests** and **Ender Chests**. Enable Xray with X and select the types
 you want to mark; **Show through walls** controls visibility through blocks.
 Chest markers use amber, coral and lavender outlines respectively, sharing the

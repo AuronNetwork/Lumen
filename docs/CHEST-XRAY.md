@@ -1,4 +1,4 @@
-# Chest Xray (1.6.0 candidate)
+# Chest Xray (1.6 series)
 
 Target: Minecraft Bedrock 26.51 for Windows x64, executable 1.26.51.1.
 
@@ -45,8 +45,15 @@ drawing code was rendered offscreen with sample data at 1280x720 and 1280x900;
 the new filter labels and status fit without clipping or overlapping controls.
 This checks layout only, not live cursor interaction or game rendering.
 
-New in-game chest behavior has not yet received user acceptance. Test after
-saving and fully restarting Minecraft:
+On September 19, 2026, the user confirmed that the requested test of the 1.6.0
+candidate passed: normal, trapped and ender chests displayed behind walls,
+removed chests disappeared, and filter selections persisted after restarting.
+This is user-reported gameplay acceptance. It does not replace independent
+visual observation or establish separate non-operator or automatic-update
+handoff acceptance. The public release retains the accepted feature code and
+rebuilds it with CI-generated version metadata.
+
+For reproducing the feature checks, save and fully restart Minecraft:
 
 1. In a local test world, place a normal chest, a double chest, a trapped chest
    and an ender chest within the selected radius, with an opaque wall between
@@ -59,6 +66,6 @@ saving and fully restarting Minecraft:
    Insert/Escape/mouse controls still work.
 5. Restart Minecraft/Lumen and confirm the ore and chest selections were retained.
 
-The 1.5.7 release's accepted gameplay remains the baseline. It does not establish
-acceptance of these new chest markers. The candidate is kept local pending this
-test and is not automatically published to existing users.
+The 1.5.7 release's accepted gameplay remains the baseline for the existing
+features. The chest acceptance above is recorded separately from that baseline
+and from the automated scanner/layout checks.
